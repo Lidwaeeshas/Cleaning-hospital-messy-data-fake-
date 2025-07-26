@@ -1,0 +1,48 @@
+import pandas as pd
+
+df = pd.read_csv('messy_hospital_data.csv')
+
+valid = df['PatientID'].str.match('^P\\d{4}$', na = False)
+
+df = df[valid]
+
+df = df.dropna(subset = ['Discharged'])
+
+dis_valid = df['Discharged'].str.match('.{2,}', na = False)
+
+df = df[dis_valid]
+
+df['Age'] = pd.to_numeric(df['Age'], errors = 'coerce')
+
+df['Age'] = df['Age'].fillna(df['Age'].mean())
+
+df.loc[(df['Gender'] == 'Female') | (df['Gender'] == 'f'), 'Gender'] = 'F'
+
+df.loc[(df['Gender'] == 'Male') | (df['Gender'] == 'm') | (df['Gender'] == 'male') , 'Gender'] = 'M'
+
+valid_gen = ['M','F']
+
+df = df[df['Gender'].isin(valid_gen)]
+
+df['Height_cm'] = pd.to_numeric(df['Height_cm'], errors = 'coerce')
+
+df['Height_cm'] = df['Height_cm'].fillna(df['Height_cm'].min())
+
+df['Weight_kg'] = pd.to_numeric(df['Weight_kg'], errors = 'coerce')
+
+df['Weight_kg'] = df['Weight_kg'].fillna(df['Weight_kg'].min())
+
+df['BloodPressure'] = pd.to_numeric(df['BloodPressure'], errors = 'coerce')
+
+df['BloodPressure'] = df['BloodPressure'].fillna(df['BloodPressure'].mean())
+
+df.loc[(df['Smoker'] == 'N') | (df['Smoker'] == 'n'), 'Smoker'] = 'No'
+
+df.loc[(df['Smoker'] == 'Y') | (df['Smoker'] == 'y'), 'Smoker'] = 'Yes'
+
+s_valid = ['Yes','No']
+
+df = df[df['Smoker'].isin(s_valid)]
+
+
+print(df.to_string())
